@@ -154,6 +154,12 @@ const Page = ({
 export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number }) {
   const { t } = useLanguage();
 
+  // Determine base path manually for the static string
+  const isProd = typeof window !== 'undefined' && 
+                 window.location.hostname.includes('github.io');
+  const basePath = isProd ? '/LuisLeon1705' : '';
+  const finalPortraitPath = `${basePath}/Photograph/Curriculum.jpg`;
+
   const s0 = t.menu.spreads[0];
   const s1 = t.menu.spreads[1];
   const s2 = t.menu.spreads[2];
@@ -171,7 +177,7 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
             title={t.menu.title} 
             subtitle={t.menu.subtitle} 
             showPortrait={true} 
-            portraitPath={portrait} 
+            portraitPath={finalPortraitPath} 
             pageNumber={1} 
             totalPageNumbers={6}
             side="left"
