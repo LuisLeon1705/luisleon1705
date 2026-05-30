@@ -154,7 +154,7 @@ const Page = ({
 export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number }) {
   const { t } = useLanguage();
 
-  // Use the environment variable injected during build
+  // Use the environment variable injected during build (from next.config.ts)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   const finalPortraitPath = `${basePath}/Photograph/Curriculum.jpg`;
 
