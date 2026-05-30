@@ -1,7 +1,7 @@
 'use client';
 
-import { useScroll, useTransform, motion } from 'framer-motion';
-import { useRef } from 'react';
+import { useScroll, useTransform, motion, useMotionValueEvent } from 'framer-motion';
+import { useRef, useState } from 'react';
 import NeonAlleyWindow from '@/components/NeonAlleyWindow';
 import MidnightBrew from '@/components/MidnightBrew';
 import TheDossier from '@/components/TheDossier';
@@ -11,39 +11,52 @@ import { Languages } from 'lucide-react';
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { toggleLanguage, language } = useLanguage();
+  const [activeSpread, setActiveSpread] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
+  // Track scroll to update dossier pages - Starts after landing (0.3)
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    // 0.0 - 0.3: Landing animation
+    // 0.3 - 0.5: Page 1 (index 0)
+    // 0.55 - 0.75: Page 2 (index 1)
+    // 0.8 - 1.0: Page 3 (index 2)
+    if (latest < 0.5) setActiveSpread(0);
+    else if (latest < 0.78) setActiveSpread(1);
+    else setActiveSpread(2);
+  });
+
   // Layer 1: Window (Background)
-  const windowOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
-  const windowScale = useTransform(scrollYProgress, [0, 0.5], [0.8, 0.9]);
-  const windowZ = useTransform(scrollYProgress, [0, 0.5], [-200, -300]);
-  const windowY = useTransform(scrollYProgress, [0, 0.3], [0, -600]);
+  const windowOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const windowScale = useTransform(scrollYProgress, [0, 0.4], [0.8, 0.9]);
+  const windowZ = useTransform(scrollYProgress, [0, 0.4], [-200, -300]);
+  const windowY = useTransform(scrollYProgress, [0, 0.25], [0, -600]);
 
   // Layer 1.5: Background Ambiance (Diner Interior Architecture)
-  const ambianceOpacity = useTransform(scrollYProgress, [0, 0.4], [0.2, 0]);
-  const ambianceScale = useTransform(scrollYProgress, [0, 0.6], [0.8, 1.1]);
-  const ambianceY = useTransform(scrollYProgress, [0, 0.6], [50, -100]);
+  const ambianceOpacity = useTransform(scrollYProgress, [0, 0.3], [0.2, 0]);
+  const ambianceScale = useTransform(scrollYProgress, [0, 0.4], [0.8, 1.1]);
+  const ambianceY = useTransform(scrollYProgress, [0, 0.4], [50, -100]);
 
   // Layer 2: The Main Table Surface & Dossier (Midground)
-  const menuScale = useTransform(scrollYProgress, [0, 0.8], [0.5, 1]);
-  const menuY = useTransform(scrollYProgress, [0, 0.8], [600, 0]);
-  const menuRotateX = useTransform(scrollYProgress, [0, 0.8], [90, 0]);
+  // Landing animation compressed to 0.3
+  const menuScale = useTransform(scrollYProgress, [0, 0.3], [0.5, 1]);
+  const menuY = useTransform(scrollYProgress, [0, 0.3], [600, 0]);
+  const menuRotateX = useTransform(scrollYProgress, [0, 0.3], [90, 0]);
   
-  // Table Surface animation - Different shade and MUCH wider to be a true table
-  const tableScale = useTransform(scrollYProgress, [0, 0.8], [0.6, 1.3]);
-  const tableOpacity = useTransform(scrollYProgress, [0, 0.85], [0.5, 0]);
+  // Table Surface animation
+  const tableScale = useTransform(scrollYProgress, [0, 0.3], [0.6, 1.3]);
+  const tableOpacity = useTransform(scrollYProgress, [0, 0.35], [0.5, 1]);
 
   // Layer 3: Coffee (Foreground)
-  const coffeeX = useTransform(scrollYProgress, [0, 0.3], [0, 300]);
-  const coffeeY = useTransform(scrollYProgress, [0, 0.3], [0, 400]);
-  const coffeeOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
+  const coffeeX = useTransform(scrollYProgress, [0, 0.2], [0, 300]);
+  const coffeeY = useTransform(scrollYProgress, [0, 0.2], [0, 400]);
+  const coffeeOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
 
   return (
-    <main ref={containerRef} className="relative h-[300vh] bg-zinc-950">
+    <main ref={containerRef} className="relative h-[600vh] bg-zinc-950">
       {/* Sticky Scene Container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center perspective-[1500px]">
         
@@ -114,7 +127,7 @@ export default function Home() {
           }}
           className="relative z-20 w-full max-w-5xl px-4"
         >
-          <TheDossier />
+          <TheDossier activeSpread={activeSpread} />
         </motion.div>
 
         {/* Layer 3: The Midnight Brew */}

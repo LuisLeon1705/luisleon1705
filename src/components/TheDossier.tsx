@@ -1,13 +1,12 @@
 'use client';
 
 import { useLanguage } from '@/lib/LanguageContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronRight, ChevronLeft, Languages, Mail, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
-import portrait from '../../public/Photograph/Curriculum.jpg';
+import { ReactNode } from 'react';
 
-const Tooltip = ({ content, children }: { content: string, children: React.ReactNode }) => {
+const Tooltip = ({ content, children }: { content: string, children: ReactNode }) => {
   return (
     <div className="relative group/tooltip inline-block w-full">
       {children}
@@ -19,207 +18,276 @@ const Tooltip = ({ content, children }: { content: string, children: React.React
   );
 };
 
-export default function TheDossier() {
-  const { t, language } = useLanguage();
-  const [currentSpread, setCurrentSpread] = useState(0);
+const Page = ({ 
+  title, 
+  subtitle, 
+  bio, 
+  highlights, 
+  sections, 
+  contactTitle, 
+  email, 
+  pageNumber, 
+  totalPageNumbers,
+  showPortrait,
+  portraitPath,
+  side
+}: any) => {
+  return (
+    <div className={`w-full h-full p-8 md:p-12 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,1)_0%,rgba(250,250,250,1)_100%)] flex flex-col ${side === 'left' ? 'border-r border-zinc-200' : ''}`}>
+      <header className="text-center mb-8 relative">
+        {showPortrait && (
+          <div className="absolute -top-12 -left-6 rotate-[-3deg] w-24 h-32 md:w-28 md:h-36 bg-white p-2 shadow-[5px_10px_20px_rgba(0,0,0,0.2)] border border-zinc-200 z-20 group">
+            <div className="w-full h-full relative overflow-hidden bg-zinc-100 grayscale contrast-[1.1] sepia-[0.15] group-hover:sepia-0 group-hover:grayscale-0 transition-all duration-700">
+              <Image 
+                src={portraitPath} 
+                alt="Chef's Portrait" 
+                fill 
+                className="object-cover" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-6 bg-white/40 backdrop-blur-sm border border-white/20 rotate-[2deg] shadow-sm" />
+          </div>
+        )}
 
-  const totalSpreads = t.menu.spreads.length;
-  const spread = t.menu.spreads[currentSpread];
+        <div className={showPortrait ? "pt-16 md:pt-0" : ""}>
+          <h1 className="text-2xl uppercase tracking-[0.25em] mb-2 font-bold text-zinc-800 leading-tight">
+            {title}
+          </h1>
+          {subtitle && <p className="italic text-zinc-500 text-[11px] tracking-wide">{subtitle}</p>}
+          <div className="w-16 h-[1.5px] bg-zinc-900 mx-auto mt-4" />
+        </div>
+      </header>
 
-  const nextSpread = () => setCurrentSpread((prev) => Math.min(prev + 1, totalSpreads - 1));
-  const prevSpread = () => setCurrentSpread((prev) => Math.max(prev - 1, 0));
+      <section className="space-y-6 flex-1">
+        {bio && (
+          <p className="font-inter text-[13px] text-zinc-700 leading-relaxed italic border-l-2 border-zinc-200 pl-4 py-1">
+            {bio}
+          </p>
+        )}
+
+        {highlights && (
+          <ul className="space-y-3 font-inter text-[11px] text-zinc-600">
+            {highlights.map((item: string, i: number) => (
+              <li key={i} className="flex gap-3 items-start">
+                <span className="w-1.5 h-1.5 bg-zinc-800 rounded-full mt-1 shrink-0" />
+                <span className="leading-relaxed">{item}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {sections?.ingredients && (
+          <div className="space-y-4">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] mb-4 text-zinc-400 font-black border-b border-zinc-100 pb-1">{sections.ingredients.title}</h3>
+            {sections.ingredients.categories.map((cat: any, i: number) => (
+              <Tooltip key={i} content={cat.tooltip}>
+                <div className="flex justify-between items-baseline gap-4 group/item cursor-help">
+                  <span className="text-[11px] uppercase tracking-widest text-zinc-900 font-bold group-hover/item:translate-x-1 transition-transform">{cat.name}</span>
+                  <div className="flex-1 border-b border-dotted border-zinc-300 mb-1" />
+                  <span className="font-inter text-[9px] text-zinc-500 text-right italic">{cat.items}</span>
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+        )}
+
+        {sections?.mainCourses && (
+          <div className="space-y-6">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] mb-4 text-zinc-400 font-black border-b border-zinc-100 pb-1">{sections.mainCourses.title}</h3>
+            {sections.mainCourses.projects.map((project: any, i: number) => (
+              <Tooltip key={i} content={project.tooltip}>
+                <div className="group/proj cursor-help">
+                  <h4 className="text-[11px] uppercase tracking-[0.2em] text-zinc-900 mb-2 font-bold group-hover/proj:text-zinc-500 transition-colors">
+                    {project.name}
+                  </h4>
+                  <p className="font-inter text-[10px] text-zinc-600 leading-relaxed pl-3 border-l border-zinc-100 group-hover/proj:border-zinc-300 transition-colors">
+                    {project.desc}
+                  </p>
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+        )}
+
+        {contactTitle && (
+          <div className="pt-6 border-t border-zinc-100 mt-auto">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] mb-4 text-zinc-400 font-black">
+              {contactTitle}
+            </h3>
+            <div className="space-y-3">
+              {/* Email Line */}
+              <a href={`mailto:${email}`} className="flex justify-between items-baseline gap-4 group/contact cursor-pointer">
+                <span className="text-[11px] uppercase tracking-widest text-zinc-900 font-bold group-hover/contact:translate-x-1 transition-transform">
+                  Email
+                </span>
+                <div className="flex-1 border-b border-dotted border-zinc-300 mb-1" />
+                <div className="flex items-center gap-2">
+                  <span className="font-inter text-[9px] text-zinc-500 italic hidden md:inline">{email}</span>
+                  <Mail size={14} className="text-zinc-400 group-hover/contact:text-zinc-900 transition-colors" />
+                </div>
+              </a>
+
+              {/* WhatsApp Line */}
+              <a href="https://wa.me/584128526543" target="_blank" rel="noopener noreferrer" className="flex justify-between items-baseline gap-4 group/contact cursor-pointer">
+                <span className="text-[11px] uppercase tracking-widest text-zinc-900 font-bold group-hover/contact:translate-x-1 transition-transform">
+                  WhatsApp
+                </span>
+                <div className="flex-1 border-b border-dotted border-zinc-300 mb-1" />
+                <div className="flex items-center gap-2">
+                  <span className="font-inter text-[9px] text-zinc-500 italic hidden md:inline">+58 412-8526543</span>
+                  <MessageSquare size={14} className="text-zinc-400 group-hover/contact:text-zinc-900 transition-colors" />
+                </div>
+              </a>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <footer className="mt-8 pt-4 border-t border-zinc-50 text-[9px] uppercase tracking-[0.4em] text-zinc-300 text-center font-black">
+        {pageNumber} / {totalPageNumbers}
+      </footer>
+    </div>
+  );
+};
+
+export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number }) {
+  const { t } = useLanguage();
+
+  // Determine base path for assets (GitHub Pages vs Vercel/Local)
+  const isProd = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+  const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+  const basePath = (isProd && !isVercel) ? '/LuisLeon1705' : '';
+  const portraitPath = `${basePath}/Photograph/Curriculum.jpg`;
+
+  const s0 = t.menu.spreads[0];
+  const s1 = t.menu.spreads[1];
+  const s2 = t.menu.spreads[2];
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 bg-[#1a1a1a] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] rounded-lg relative">
+    <div className="w-full max-w-5xl mx-auto p-4 relative h-[85vh] min-h-[600px] max-h-[800px]">
       
-      {/* The Dossier Internal Structure */}
-      <div className="relative flex flex-col md:flex-row bg-[#fafafa] border border-zinc-200 min-h-[75vh] font-playfair overflow-hidden rounded-sm shadow-inner">
+      {/* The Book Container */}
+      <div className="relative w-full h-full flex perspective-[3000px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)]">
         
-        {/* Central Spine Shadow */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-zinc-300 z-10 hidden md:block" />
-        <div className="absolute left-1/2 top-0 bottom-0 w-12 bg-gradient-to-r from-black/5 to-transparent -translate-x-full z-0 hidden md:block" />
-        <div className="absolute left-1/2 top-0 bottom-0 w-12 bg-gradient-to-l from-black/5 to-transparent z-0 hidden md:block" />
+        {/* Static Left Background (Page 1) */}
+        <div className="absolute left-0 top-0 w-1/2 h-full z-10">
+          <Page 
+            {...s0.leftPage} 
+            title={t.menu.title} 
+            subtitle={t.menu.subtitle} 
+            showPortrait={true} 
+            portraitPath={portraitPath} 
+            pageNumber={1} 
+            totalPageNumbers={6}
+            side="left"
+          />
+        </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={currentSpread}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-col md:flex-row w-full h-full flex-1"
+        {/* Static Right Background (Page 6) */}
+        <div className="absolute right-0 top-0 w-1/2 h-full z-10">
+          <Page 
+            {...s2.rightPage} 
+            pageNumber={6} 
+            totalPageNumbers={6}
+            side="right"
+          />
+        </div>
+
+        {/* Leaf 1: Front=R0 (Page 2), Back=L1 (Page 3) */}
+        <motion.div 
+          initial={false}
+          animate={{ 
+            rotateY: activeSpread >= 1 ? -180 : 0,
+            zIndex: activeSpread >= 1 ? 20 : 40 
+          }}
+          transition={{ duration: 0.9, ease: [0.645, 0.045, 0.355, 1] }}
+          style={{ 
+            transformOrigin: "left center",
+            transformStyle: "preserve-3d" 
+          }}
+          className="absolute right-0 top-0 w-1/2 h-full"
+        >
+          {/* Front Face (Page 2) */}
+          <div 
+            className="absolute inset-0 z-20"
+            style={{ 
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(0deg) translateZ(1px)"
+            }}
           >
-            {/* Left Page */}
-            <div className="flex-1 p-8 md:p-14 border-b md:border-b-0 md:border-r border-zinc-100 relative z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,1)_0%,rgba(250,250,250,1)_100%)]">
-              <header className="text-center mb-10 relative">
-                {currentSpread === 0 && (
-                  <div className="absolute -top-12 -left-10 rotate-[-3deg] w-28 h-36 md:w-36 md:h-44 bg-white p-2 shadow-[5px_10px_20px_rgba(0,0,0,0.2)] border border-zinc-200 z-20 group">
-                    <div className="w-full h-full relative overflow-hidden bg-zinc-100 grayscale contrast-[1.1] sepia-[0.15] group-hover:sepia-0 group-hover:grayscale-0 transition-all duration-700">
-                      <Image 
-                        src={portrait} 
-                        alt="Chef's Portrait" 
-                        fill 
-                        className="object-cover" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    </div>
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-8 bg-white/40 backdrop-blur-sm border border-white/20 rotate-[2deg] shadow-sm" />
-                  </div>
-                )}
-
-                <div className={currentSpread === 0 ? "pt-20 md:pt-0" : ""}>
-                  <h1 className="text-3xl uppercase tracking-[0.25em] mb-2 font-bold text-zinc-800">
-                    {currentSpread === 0 ? t.menu.title : spread.leftPage.title}
-                  </h1>
-                  {currentSpread === 0 && <p className="italic text-zinc-500 text-sm tracking-wide">{t.menu.subtitle}</p>}
-                  <div className="w-20 h-[1.5px] bg-zinc-900 mx-auto mt-6" />
-                </div>
-              </header>
-
-              <section className="space-y-6 mt-4">
-                {currentSpread !== 0 && (
-                   <h2 className="text-xl uppercase tracking-[0.15em] border-b border-zinc-200 pb-3 text-zinc-900">
-                    {spread.leftPage.title}
-                  </h2>
-                )}
-                
-                {spread.leftPage.bio && (
-                  <p className="font-inter text-sm text-zinc-700 leading-relaxed italic border-l-2 border-zinc-200 pl-4 py-1">
-                    {spread.leftPage.bio}
-                  </p>
-                )}
-
-                {spread.leftPage.highlights && (
-                  <ul className="space-y-3 font-inter text-xs text-zinc-600">
-                    {spread.leftPage.highlights.map((item: string, i: number) => (
-                      <li key={i} className="flex gap-3 items-start">
-                        <span className="w-1.5 h-1.5 bg-zinc-800 rounded-full mt-1 shrink-0" />
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                {spread.leftPage.sections?.mainCourses && (
-                  <div className="space-y-6">
-                    {spread.leftPage.sections.mainCourses.projects.map((project: any, i: number) => (
-                      <Tooltip key={i} content={project.tooltip}>
-                        <div className="group/proj cursor-help">
-                          <h4 className="text-sm uppercase tracking-[0.2em] text-zinc-900 mb-2 font-bold group-hover/proj:text-zinc-500 transition-colors">
-                            {project.name}
-                          </h4>
-                          <p className="font-inter text-[11px] text-zinc-600 leading-relaxed pl-3 border-l border-zinc-100 group-hover/proj:border-zinc-300 transition-colors">
-                            {project.desc}
-                          </p>
-                        </div>
-                      </Tooltip>
-                    ))}
-                  </div>
-                )}
-
-                {spread.leftPage.contactTitle && (
-                  <div className="pt-6 border-t border-zinc-100">
-                    <h3 className="text-[10px] uppercase tracking-[0.3em] mb-3 text-zinc-400 font-black">
-                      {spread.leftPage.contactTitle}
-                    </h3>
-                    <p className="font-mono text-sm text-zinc-900">
-                      {spread.leftPage.email}
-                    </p>
-                  </div>
-                )}
-              </section>
-            </div>
-
-            {/* Right Page */}
-            <div className="flex-1 p-8 md:p-14 relative z-10 flex flex-col bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,1)_0%,rgba(252,252,252,1)_100%)]">
-              <section className="flex-1 space-y-10">
-                <h2 className="text-xl uppercase tracking-[0.15em] border-b border-zinc-200 pb-3 mb-8 text-zinc-900">
-                  {spread.rightPage.title}
-                </h2>
-
-                {spread.rightPage.sections?.ingredients && (
-                  <div className="space-y-5">
-                    {spread.rightPage.sections.ingredients.categories.map((cat: any, i: number) => (
-                      <Tooltip key={i} content={cat.tooltip}>
-                        <div className="flex justify-between items-baseline gap-4 group/item cursor-help">
-                          <span className="text-sm uppercase tracking-widest text-zinc-900 font-bold group-hover/item:translate-x-1 transition-transform">{cat.name}</span>
-                          <div className="flex-1 border-b border-dotted border-zinc-300 mb-1" />
-                          <span className="font-inter text-[10px] text-zinc-500 text-right italic">{cat.items}</span>
-                        </div>
-                      </Tooltip>
-                    ))}
-                  </div>
-                )}
-
-                {spread.rightPage.sections?.mainCourses && (
-                  <div className="space-y-8">
-                    {spread.rightPage.sections.mainCourses.projects.map((project: any, i: number) => (
-                      <Tooltip key={i} content={project.tooltip}>
-                        <div className="group/proj cursor-help">
-                          <h4 className="text-sm uppercase tracking-[0.2em] text-zinc-900 mb-2 font-bold group-hover/proj:text-zinc-500 transition-colors">
-                            {project.name}
-                          </h4>
-                          <p className="font-inter text-[11px] text-zinc-600 leading-relaxed pl-3 border-l border-zinc-100 group-hover/proj:border-zinc-300 transition-colors">
-                            {project.desc}
-                          </p>
-                        </div>
-                      </Tooltip>
-                    ))}
-                  </div>
-                )}
-
-                {spread.rightPage.bio && (
-                  <p className="font-inter text-sm text-zinc-700 leading-relaxed italic border-l-2 border-zinc-200 pl-4 py-1">
-                    {spread.rightPage.bio}
-                  </p>
-                )}
-
-                {spread.rightPage.highlights && (
-                  <ul className="space-y-3 font-inter text-xs text-zinc-600">
-                    {spread.rightPage.highlights.map((item: string, i: number) => (
-                      <li key={i} className="flex gap-3 items-start">
-                        <span className="w-1.5 h-1.5 bg-zinc-800 rounded-full mt-1 shrink-0" />
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                {spread.rightPage.contactTitle && (
-                  <div className="pt-6 border-t border-zinc-100">
-                    <h3 className="text-[10px] uppercase tracking-[0.3em] mb-3 text-zinc-400 font-black">
-                      {spread.rightPage.contactTitle}
-                    </h3>
-                    <p className="font-mono text-sm text-zinc-900">
-                      {spread.rightPage.email}
-                    </p>
-                  </div>
-                )}
-              </section>
-
-              <footer className="mt-16 text-[10px] uppercase tracking-[0.4em] text-zinc-300 text-center font-black">
-                {language === 'en' ? 'Authentic Experience' : 'Experiencia Auténtica'} — {currentSpread + 1} / {totalSpreads}
-              </footer>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation Controls */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-between px-8 z-50">
-          <button 
-            onClick={prevSpread}
-            disabled={currentSpread === 0}
-            className={`flex items-center gap-1 text-[10px] uppercase tracking-widest transition-opacity ${currentSpread === 0 ? "opacity-0 pointer-events-none" : "opacity-50 hover:opacity-100"}`}
+            <Page {...s0.rightPage} pageNumber={2} totalPageNumbers={6} side="right" />
+            {/* Spine Shadow on Front */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+          </div>
+          
+          {/* Back Face (Page 3) */}
+          <div 
+            className="absolute inset-0 z-10"
+            style={{ 
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg) translateZ(1px)"
+            }}
           >
-            <ChevronLeft size={14} /> {t.menu.navigation.prev}
-          </button>
-          <button 
-            onClick={nextSpread}
-            disabled={currentSpread === totalSpreads - 1}
-            className={`flex items-center gap-1 text-[10px] uppercase tracking-widest transition-opacity ${currentSpread === totalSpreads - 1 ? "opacity-0 pointer-events-none" : "opacity-50 hover:opacity-100"}`}
+            <Page {...s1.leftPage} pageNumber={3} totalPageNumbers={6} side="left" />
+            {/* Spine Shadow on Back */}
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/10 to-transparent pointer-events-none" />
+          </div>
+        </motion.div>
+
+        {/* Leaf 2: Front=R1 (Page 4), Back=L2 (Page 5) */}
+        <motion.div 
+          initial={false}
+          animate={{ 
+            rotateY: activeSpread >= 2 ? -180 : 0,
+            zIndex: activeSpread >= 2 ? 40 : 30
+          }}
+          transition={{ duration: 0.9, ease: [0.645, 0.045, 0.355, 1] }}
+          style={{ 
+            transformOrigin: "left center",
+            transformStyle: "preserve-3d" 
+          }}
+          className="absolute right-0 top-0 w-1/2 h-full"
+        >
+          {/* Front Face (Page 4) */}
+          <div 
+            className="absolute inset-0 z-20"
+            style={{ 
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(0deg) translateZ(1px)"
+            }}
           >
-            {t.menu.navigation.next} <ChevronRight size={14} />
-          </button>
+            <Page {...s1.rightPage} pageNumber={4} totalPageNumbers={6} side="right" />
+            {/* Spine Shadow on Front */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
+          </div>
+          
+          {/* Back Face (Page 5) */}
+          <div 
+            className="absolute inset-0 z-10"
+            style={{ 
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg) translateZ(1px)"
+            }}
+          >
+            <Page {...s2.leftPage} pageNumber={5} totalPageNumbers={6} side="left" />
+            {/* Spine Shadow on Back */}
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/10 to-transparent pointer-events-none" />
+          </div>
+        </motion.div>
+
+        {/* Central Spine Line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-zinc-300 z-50 pointer-events-none" />
+      </div>
+
+      {/* Manual Navigation Controls (Optional but kept for UX) */}
+      <div className="absolute -bottom-12 left-0 right-0 flex justify-between px-8 z-50 pointer-events-none">
+        <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold opacity-30">
+          Desliza para hojear
         </div>
       </div>
     </div>
