@@ -1,10 +1,11 @@
 'use client';
 
 import { useLanguage } from '@/lib/LanguageContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Languages, Mail, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import { ReactNode } from 'react';
+import portrait from '../../public/Photograph/Curriculum.jpg';
 
 const Tooltip = ({ content, children }: { content: string, children: ReactNode }) => {
   return (
@@ -116,7 +117,6 @@ const Page = ({
               {contactTitle}
             </h3>
             <div className="space-y-3">
-              {/* Email Line */}
               <a href={`mailto:${email}`} className="flex justify-between items-baseline gap-4 group/contact cursor-pointer">
                 <span className="text-[11px] uppercase tracking-widest text-zinc-900 font-bold group-hover/contact:translate-x-1 transition-transform">
                   Email
@@ -128,7 +128,6 @@ const Page = ({
                 </div>
               </a>
 
-              {/* WhatsApp Line */}
               <a href="https://wa.me/584128526543" target="_blank" rel="noopener noreferrer" className="flex justify-between items-baseline gap-4 group/contact cursor-pointer">
                 <span className="text-[11px] uppercase tracking-widest text-zinc-900 font-bold group-hover/contact:translate-x-1 transition-transform">
                   WhatsApp
@@ -154,44 +153,26 @@ const Page = ({
 export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number }) {
   const { t } = useLanguage();
 
-  // Robust client-side check for GitHub Pages
-  let basePath = '';
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname.includes('github.io')) {
-      basePath = '/LuisLeon1705';
-    }
-  } else {
-    // Fallback for build-time/server-side
-    basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  }
-  
-  const finalPortraitPath = `${basePath}/Photograph/Curriculum.jpg`;
-
   const s0 = t.menu.spreads[0];
   const s1 = t.menu.spreads[1];
   const s2 = t.menu.spreads[2];
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 relative h-[85vh] min-h-[600px] max-h-[800px]">
-      
-      {/* The Book Container */}
       <div className="relative w-full h-full flex perspective-[3000px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)]">
-        
-        {/* Static Left Background (Page 1) */}
         <div className="absolute left-0 top-0 w-1/2 h-full z-10">
           <Page 
             {...s0.leftPage} 
             title={t.menu.title} 
             subtitle={t.menu.subtitle} 
             showPortrait={true} 
-            portraitPath={finalPortraitPath} 
+            portraitPath={portrait} 
             pageNumber={1} 
             totalPageNumbers={6}
             side="left"
           />
         </div>
 
-        {/* Static Right Background (Page 6) */}
         <div className="absolute right-0 top-0 w-1/2 h-full z-10">
           <Page 
             {...s2.rightPage} 
@@ -201,7 +182,6 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
           />
         </div>
 
-        {/* Leaf 1: Front=R0 (Page 2), Back=L1 (Page 3) */}
         <motion.div 
           initial={false}
           animate={{ 
@@ -215,7 +195,6 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
           }}
           className="absolute right-0 top-0 w-1/2 h-full"
         >
-          {/* Front Face (Page 2) */}
           <div 
             className="absolute inset-0 z-20"
             style={{ 
@@ -225,11 +204,9 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
             }}
           >
             <Page {...s0.rightPage} pageNumber={2} totalPageNumbers={6} side="right" />
-            {/* Spine Shadow on Front */}
             <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
           </div>
           
-          {/* Back Face (Page 3) */}
           <div 
             className="absolute inset-0 z-10"
             style={{ 
@@ -239,12 +216,10 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
             }}
           >
             <Page {...s1.leftPage} pageNumber={3} totalPageNumbers={6} side="left" />
-            {/* Spine Shadow on Back */}
             <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/10 to-transparent pointer-events-none" />
           </div>
         </motion.div>
 
-        {/* Leaf 2: Front=R1 (Page 4), Back=L2 (Page 5) */}
         <motion.div 
           initial={false}
           animate={{ 
@@ -258,7 +233,6 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
           }}
           className="absolute right-0 top-0 w-1/2 h-full"
         >
-          {/* Front Face (Page 4) */}
           <div 
             className="absolute inset-0 z-20"
             style={{ 
@@ -268,11 +242,9 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
             }}
           >
             <Page {...s1.rightPage} pageNumber={4} totalPageNumbers={6} side="right" />
-            {/* Spine Shadow on Front */}
             <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
           </div>
           
-          {/* Back Face (Page 5) */}
           <div 
             className="absolute inset-0 z-10"
             style={{ 
@@ -282,16 +254,13 @@ export default function TheDossier({ activeSpread = 0 }: { activeSpread?: number
             }}
           >
             <Page {...s2.leftPage} pageNumber={5} totalPageNumbers={6} side="left" />
-            {/* Spine Shadow on Back */}
             <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/10 to-transparent pointer-events-none" />
           </div>
         </motion.div>
 
-        {/* Central Spine Line */}
         <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-zinc-300 z-50 pointer-events-none" />
       </div>
 
-      {/* Manual Navigation Controls (Optional but kept for UX) */}
       <div className="absolute -bottom-12 left-0 right-0 flex justify-between px-8 z-50 pointer-events-none">
         <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold opacity-30">
           Desliza para hojear
